@@ -11,9 +11,8 @@ License: Educational/Research Use
 
 Modules:
     alignment: Sequence alignment algorithms
-    genome_rearrangement: Genome analysis and rearrangement tools  
-    utils: Core utility functions and data structures
-    examples: Demonstration scripts and usage examples
+    utils: Core utility functions and genome graph operations
+    examples: Demonstration scripts for MSA algorithm
 """
 
 __version__ = "1.0.0"
@@ -28,9 +27,7 @@ __changelog__ = {
 # Package metadata
 __all__ = [
     'alignment',
-    'genome_rearrangement', 
-    'utils',
-    'examples'
+    'utils'
 ]
 
 def get_version():
