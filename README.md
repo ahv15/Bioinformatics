@@ -8,9 +8,6 @@ This repository implements fundamental bioinformatics algorithms with a focus on
 - **Multiple Sequence Alignment (MSA)** using simulated annealing optimization
 - **Genome Rearrangement Analysis** including fragile region detection
 - **Chromosomal Graph Operations** for studying genome structure and evolution
-- **Modular Design** with reusable utilities and clear separation of concerns
-
-All algorithms are implemented from scratch without external bioinformatics libraries, making this an excellent educational resource and a solid foundation for custom bioinformatics pipelines.
 
 ## Directory Structure
 
@@ -191,28 +188,3 @@ print(f"Colored edges: {edges}")
 - **Colored Edges**: Adjacency representation for genome structure  
 - **Two-Break Operations**: Fundamental rearrangement mechanism
 - **Graph-Genome Conversion**: Reconstruction from graph representation
-
-## Educational Value
-
-This repository serves as an excellent educational resource for:
-- **Algorithm Implementation**: Learn how bioinformatics algorithms work internally
-- **Computational Biology**: Understand the computational aspects of biological problems
-- **Python Programming**: See examples of clean, modular scientific code
-- **Software Design**: Study well-structured bioinformatics software architecture
-
-## Contributing
-
-When contributing to this repository:
-1. Follow the existing code style and documentation patterns
-2. Add comprehensive docstrings to all functions and classes
-3. Include example usage in docstrings
-4. Update this README if adding new modules or changing the structure
-5. Ensure all code works with Python 3.7+ and standard library only
-
-## License
-
-This project is designed for educational and research purposes. Please ensure proper attribution when using this code in academic work or research publications.
-
----
-
-*For questions, issues, or contributions, please refer to the repository's issue tracker or contact the maintainers.*
