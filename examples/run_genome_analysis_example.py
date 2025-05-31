@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Example: Genome Rearrangement and Fragile Region Analysis
+Example: Genome Graph Operations
 
-This script demonstrates how to use the genome rearrangement analysis tools
-to study chromosomal rearrangements, fragile regions, and genome evolution.
+This script demonstrates how to use the refactored genome graph operations
+that were originally in FragileRegions.py. These functions provide the
+building blocks for genome rearrangement analysis.
 
 Usage:
     python examples/run_genome_analysis_example.py
@@ -19,8 +20,14 @@ import os
 # Add the parent directory to Python path to import our modules
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from genome_rearrangement import GenomeAnalyzer, analyze_fragile_regions, compare_genomes
-from utils import chromosome_to_cycle, colored_edges
+from genome_rearrangement import (
+    chromosome_to_cycle, 
+    cycle_to_chromosome,
+    colored_edges,
+    graph_to_genome,
+    two_break_genome_graph,
+    two_break_on_genome
+)
 
 
 def demonstrate_basic_genome_operations():
@@ -35,6 +42,10 @@ def demonstrate_basic_genome_operations():
     # Convert to cycle representation
     cycle = chromosome_to_cycle(chromosome)
     print(f"Cycle representation: {cycle}")
+    
+    # Convert back to chromosome
+    back_to_chromosome = cycle_to_chromosome(cycle)
+    print(f"Back to chromosome: {back_to_chromosome}")
     
     # Example genome with multiple chromosomes
     genome = [
@@ -51,195 +62,134 @@ def demonstrate_basic_genome_operations():
     return genome
 
 
-def demonstrate_fragile_region_analysis():
-    """Demonstrate fragile region analysis."""
-    print("\n\nFragile Region Analysis")
+def demonstrate_two_break_operations():
+    """Demonstrate two-break operations on genome graphs."""
+    print("\n\nTwo-Break Operations")
     print("=" * 40)
     
-    # Create a sample genome
-    genome = [
-        [1, 2, 3, 4, 5],      # Chromosome 1 (even length)
-        [-6, 7, -8],          # Chromosome 2 (odd length - potentially fragile)
-        [9, 10, 11, 12, 13],  # Chromosome 3 (odd length - potentially fragile)
-        [14, 15, 16, 17]      # Chromosome 4 (even length)
-    ]
+    # Simple example genome
+    genome = [[1, 2, 3, 4]]
+    print(f"Original genome: {genome}")
     
-    print(f"Analyzing genome: {genome}")
+    # Get the graph representation
+    graph_edges = colored_edges(genome)
+    print(f"Original colored edges: {graph_edges}")
     
-    # Perform fragile region analysis
-    analysis_results = analyze_fragile_regions(genome)
+    # Demonstrate two-break on graph (if we have valid edges)
+    if len(graph_edges) >= 2:
+        # For demonstration, let's try a simple two-break
+        # Note: In practice, you need to carefully choose a, b, c, d values
+        # that correspond to actual edges in the graph
+        
+        print(f"\nDemonstrating two-break operations:")
+        print(f"Function available: two_break_genome_graph(edges, a, b, c, d)")
+        print(f"Function available: two_break_on_genome(genome, a, b, c, d)")
+        
+        # Show the structure without actually performing a break
+        # (since we'd need to carefully validate the parameters)
+        print(f"\nTo perform a two-break rearrangement:")
+        print(f"1. Choose four nodes a, b, c, d that form two edges (a,b) and (c,d)")
+        print(f"2. Replace them with edges (a,c) and (b,d)")
+        print(f"3. Convert back to genome representation")
     
-    print(f"\nAnalysis Results:")
-    print(f"  Total genes: {analysis_results['statistics']['total_genes']}")
-    print(f"  Number of chromosomes: {analysis_results['statistics']['num_chromosomes']}")
-    print(f"  Average chromosome length: {analysis_results['statistics']['avg_chromosome_length']:.2f}")
-    print(f"  Number of edges: {analysis_results['statistics']['num_edges']}")
-    print(f"  Fragile regions found: {analysis_results['statistics']['fragile_regions_count']}")
-    
-    if analysis_results['fragile_regions']:
-        print(f"\nFragile regions details:")
-        for i, region in enumerate(analysis_results['fragile_regions']):
-            print(f"    Region {i+1}: Chromosome {region['chromosome']}")
-            print(f"      Length: {region['length']}")
-            print(f"      Genes: {region['genes']}")
-            print(f"      Fragility score: {region['fragility_score']:.3f}")
-    
-    return genome, analysis_results
+    return graph_edges
 
 
-def demonstrate_genome_analyzer():
-    """Demonstrate the GenomeAnalyzer class."""
-    print("\n\nGenome Analyzer Demonstration")
+def demonstrate_cycle_conversions():
+    """Demonstrate chromosome-cycle conversions."""
+    print("\n\nChromosome-Cycle Conversions")
     print("=" * 40)
     
-    # Create initial genome
-    initial_genome = [
-        [1, 2, 3, 4],
-        [-5, 6, -7],
-        [8, 9]
+    # Test various chromosome configurations
+    test_chromosomes = [
+        [1, 2, 3],           # Simple forward
+        [-1, 2, -3],         # Mixed orientations
+        [4, -5, 6, -7],      # Longer with mixed orientations
+        [-1, -2, -3]         # All reverse
     ]
     
-    print(f"Initial genome: {initial_genome}")
+    for i, chromosome in enumerate(test_chromosomes, 1):
+        print(f"\nTest {i}: {chromosome}")
+        
+        # Convert to cycle
+        cycle = chromosome_to_cycle(chromosome)
+        print(f"  Cycle: {cycle}")
+        
+        # Convert back
+        back_to_chromosome = cycle_to_chromosome(cycle)
+        print(f"  Back to chromosome: {back_to_chromosome}")
+        
+        # Verify round-trip conversion
+        if chromosome == back_to_chromosome:
+            print(f"  ✓ Round-trip conversion successful")
+        else:
+            print(f"  ✗ Round-trip conversion failed!")
+
+
+def demonstrate_graph_conversions():
+    """Demonstrate graph-genome conversions."""
+    print("\n\nGraph-Genome Conversions")
+    print("=" * 40)
     
-    try:
-        # Create analyzer
-        analyzer = GenomeAnalyzer(initial_genome)
+    # Example genomes
+    test_genomes = [
+        [[1, 2]],                    # Single chromosome, simple
+        [[1, 2, 3], [4, 5]],        # Multiple chromosomes
+        [[-1, 2], [3, -4, 5]]       # Mixed orientations
+    ]
+    
+    for i, genome in enumerate(test_genomes, 1):
+        print(f"\nTest {i}: {genome}")
         
-        # Get initial statistics
-        stats = analyzer.get_statistics()
-        print(f"\nInitial validation: {stats['validation']['valid']}")
-        print(f"Total genes: {stats['validation']['total_genes']}")
-        print(f"Unique genes: {stats['validation']['unique_genes']}")
+        # Convert to colored edges
+        edges = colored_edges(genome)
+        print(f"  Colored edges: {edges}")
         
-        if stats['validation']['warnings']:
-            print(f"Warnings: {stats['validation']['warnings']}")
-        
-        # Perform fragility analysis
-        fragility = analyzer.analyze_fragility()
-        print(f"Fragile regions count: {fragility['statistics']['fragile_regions_count']}")
-        
-        # Attempt a two-break rearrangement
-        print(f"\nAttempting two-break rearrangement...")
+        # Convert back to genome
         try:
-            rearrangement_info = analyzer.apply_rearrangement(
-                "two_break",
-                a=1, b=2, c=3, d=4
-            )
-            print(f"Rearrangement successful!")
-            print(f"New genome: {analyzer.genome}")
-            print(f"Rearrangement type: {rearrangement_info['type']}")
+            back_to_genome = graph_to_genome(list(edges))  # Convert tuple to list
+            print(f"  Back to genome: {back_to_genome}")
+            
+            # Note: The conversion might not preserve exact chromosome order
+            # but should preserve the gene content and relationships
             
         except Exception as e:
-            print(f"Rearrangement failed: {e}")
-            print("This is expected if the specified edges don't exist in the genome graph.")
-        
-        # Get final statistics
-        final_stats = analyzer.get_statistics()
-        print(f"\nFinal rearrangement count: {final_stats['rearrangement_count']}")
-        
-        return analyzer
-        
-    except ValueError as e:
-        print(f"Error creating analyzer: {e}")
-        return None
-
-
-def demonstrate_genome_comparison():
-    """Demonstrate genome comparison functionality."""
-    print("\n\nGenome Comparison Demonstration")
-    print("=" * 40)
-    
-    # Create two related genomes
-    genome1 = [
-        [1, 2, 3, 4],
-        [5, 6, 7]
-    ]
-    
-    genome2 = [
-        [1, 2, 4, 3],  # Rearranged version
-        [5, 6, 7]      # Same
-    ]
-    
-    print(f"Genome 1: {genome1}")
-    print(f"Genome 2: {genome2}")
-    
-    # Compare genomes
-    comparison = compare_genomes(genome1, genome2)
-    
-    print(f"\nComparison Results:")
-    print(f"  Common edges: {len(comparison['common_edges'])}")
-    print(f"  Unique to genome 1: {len(comparison['genome1_unique_edges'])}")
-    print(f"  Unique to genome 2: {len(comparison['genome2_unique_edges'])}")
-    print(f"  Total differences: {comparison['difference_count']}")
-    print(f"  Similarity ratio: {comparison['similarity_ratio']:.3f}")
-    
-    if comparison['genome1_unique_edges']:
-        print(f"  Edges unique to genome 1: {comparison['genome1_unique_edges']}")
-    
-    if comparison['genome2_unique_edges']:
-        print(f"  Edges unique to genome 2: {comparison['genome2_unique_edges']}")
-    
-    return comparison
-
-
-def demonstrate_validation():
-    """Demonstrate genome validation."""
-    print("\n\nGenome Validation Demonstration")
-    print("=" * 40)
-    
-    # Test valid genome
-    valid_genome = [[1, 2, 3], [-4, 5]]
-    print(f"Testing valid genome: {valid_genome}")
-    
-    try:
-        analyzer = GenomeAnalyzer(valid_genome)
-        print("✓ Valid genome accepted")
-    except ValueError as e:
-        print(f"✗ Unexpected error: {e}")
-    
-    # Test invalid genome (duplicate genes)
-    print(f"\nTesting invalid genome with duplicates: [[1, 2], [2, 3]]")
-    try:
-        invalid_genome = [[1, 2], [2, 3]]  # Gene 2 appears twice
-        analyzer = GenomeAnalyzer(invalid_genome)
-        print("✗ Invalid genome was incorrectly accepted")
-    except ValueError as e:
-        print(f"✓ Invalid genome correctly rejected: {e}")
-    
-    # Test genome with zero (invalid)
-    print(f"\nTesting invalid genome with zero: [[1, 0, 3]]")
-    try:
-        zero_genome = [[1, 0, 3]]  # Gene 0 is invalid
-        analyzer = GenomeAnalyzer(zero_genome)
-        print("✗ Zero-gene genome was incorrectly accepted")
-    except ValueError as e:
-        print(f"✓ Zero-gene genome correctly rejected")
+            print(f"  Error in conversion: {e}")
 
 
 def main():
     """Main function to run all demonstrations."""
-    print("Genome Rearrangement and Fragile Region Analysis Examples")
-    print("=" * 60)
-    print("This script demonstrates various genome analysis tools and algorithms.\n")
+    print("Genome Graph Operations Examples")
+    print("=" * 50)
+    print("This script demonstrates the refactored genome graph operations")
+    print("that were originally in FragileRegions.py.\n")
     
     try:
         # Run all demonstrations
         genome = demonstrate_basic_genome_operations()
-        genome, analysis = demonstrate_fragile_region_analysis()
-        analyzer = demonstrate_genome_analyzer()
-        comparison = demonstrate_genome_comparison()
-        demonstrate_validation()
+        edges = demonstrate_two_break_operations()
+        demonstrate_cycle_conversions()
+        demonstrate_graph_conversions()
         
-        print("\n" + "=" * 60)
+        print("\n" + "=" * 50)
         print("All demonstrations completed successfully!")
-        print("\nKey takeaways:")
-        print("• Genome graphs provide a powerful representation for studying rearrangements")
-        print("• Fragile regions can be identified through structural analysis")
-        print("• The GenomeAnalyzer class provides comprehensive analysis tools")
-        print("• Genome comparison helps identify evolutionary relationships")
-        print("• Input validation ensures data integrity")
         
-        print("\nYou can modify the genomes in this script to analyze your own data.")
+        print("\nOriginal FragileRegions.py functions available:")
+        print("• chromosome_to_cycle() - Convert chromosome to cycle representation")
+        print("• cycle_to_chromosome() - Convert cycle back to chromosome")
+        print("• colored_edges() - Generate colored edges from genome")
+        print("• graph_to_genome() - Convert graph back to genome")
+        print("• two_break_genome_graph() - Apply two-break to genome graph")
+        print("• two_break_on_genome() - Apply two-break to genome")
+        
+        print("\nThese functions are now properly organized in:")
+        print("• utils/genome_graph.py (implementation)")
+        print("• genome_rearrangement/fragile_regions.py (re-exports)")
+        
+        print("\nYou can import them using:")
+        print("from genome_rearrangement import chromosome_to_cycle, colored_edges, ...")
+        print("or")
+        print("from utils import chromosome_to_cycle, colored_edges, ...")
         
     except Exception as e:
         print(f"Error running demonstrations: {e}")
