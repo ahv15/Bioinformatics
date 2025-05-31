@@ -17,12 +17,9 @@ All algorithms are implemented from scratch without external bioinformatics libr
 ├── alignment/                    # Sequence alignment algorithms
 │   ├── __init__.py              # Package initialization
 │   └── msa_simulated_annealing.py   # Multiple sequence alignment using SA
-├── genome_rearrangement/        # Genome graph operations (refactored from FragileRegions.py)
-│   ├── __init__.py              # Package initialization  
-│   └── fragile_regions.py       # Re-exports of original genome graph functions
 ├── utils/                       # Shared utility functions
 │   ├── __init__.py              # Package initialization
-│   └── genome_graph.py          # Core genome graph operations
+│   └── genome_graph.py          # Genome graph operations (from original FragileRegions.py)
 ├── examples/                    # Example scripts and demonstrations
 │   └── run_msa_example.py       # MSA algorithm demonstration
 └── README.md                    # This file
@@ -68,8 +65,7 @@ python examples/run_msa_example.py
 ```python
 # Import specific modules
 from alignment import MSASimulatedAnnealing
-from genome_rearrangement import chromosome_to_cycle, colored_edges
-from utils import graph_to_genome, two_break_on_genome
+from utils import chromosome_to_cycle, colored_edges, two_break_on_genome
 
 # Use in your code
 sequences = ["ACGTACGT", "ACGTCGT", "ACGTACGTT"]
@@ -86,17 +82,13 @@ alignment, score, history = msa.align()
   - Supports both DNA and protein sequences
   - Provides comprehensive scoring and optimization tracking
 
-### Genome Graph Operations (`genome_rearrangement/` and `utils/`)
-- **`utils/genome_graph.py`**: Core genome graph manipulation functions
+### Genome Graph Operations (`utils/`)
+- **`genome_graph.py`**: Core genome graph manipulation functions (refactored from original FragileRegions.py)
   - Chromosome to cycle conversion (`chromosome_to_cycle`)
   - Cycle to chromosome conversion (`cycle_to_chromosome`) 
   - Colored edge generation (`colored_edges`)
   - Graph to genome conversion (`graph_to_genome`)
   - Two-break operations (`two_break_genome_graph`, `two_break_on_genome`)
-
-- **`genome_rearrangement/fragile_regions.py`**: Re-exports of genome graph functions
-  - Provides backward compatibility for original FragileRegions.py functions
-  - Functions are now properly organized in utils/ but accessible here
 
 ## Example Commands
 
@@ -137,7 +129,7 @@ print(f"Colored edges: {edges}")
 
 ### Two-Break Rearrangements
 ```python
-from genome_rearrangement import two_break_on_genome
+from utils import two_break_on_genome
 
 # Define genome structure
 genome = [
@@ -181,7 +173,7 @@ This repository has been refactored from its original structure to improve:
 - **Documentation**: Added comprehensive docstrings and examples
 - **Maintainability**: Clear separation of concerns and reusable components
 
-The original `FragileRegions.py` contained basic genome graph operations (not actual fragile regions analysis). These functions have been moved to `utils/genome_graph.py` and are re-exported through `genome_rearrangement/fragile_regions.py` for backward compatibility.
+The original `FragileRegions.py` contained basic genome graph operations (not actual fragile regions analysis as the name suggested). These functions have been moved to `utils/genome_graph.py` where they belong as utility functions.
 
 ## Contributing
 
