@@ -153,5 +153,3 @@ print(f"Rearranged genome: {rearranged_genome}")
 - **Two-Break Operations**: Fundamental rearrangement mechanism
 - **Graph-Genome Conversion**: Reconstruction from graph representation
 ---
-
-*For questions, issues, or contributions, please refer to the repository's issue tracker or contact the maintainers.*
