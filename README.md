@@ -1,13 +1,12 @@
 # Bioinformatics Algorithms and Tools
 
-A comprehensive collection of bioinformatics algorithms and tools implemented from scratch in Python. This repository provides modular, well-documented implementations of key bioinformatics methods including sequence alignment, genome rearrangement analysis, and chromosomal structure manipulation.
+A comprehensive collection of bioinformatics algorithms and tools implemented from scratch in Python. This repository provides modular, well-documented implementations of key bioinformatics methods including sequence alignment and genome graph operations.
 
 ## Project Overview
 
 This repository implements fundamental bioinformatics algorithms with a focus on:
 - **Multiple Sequence Alignment (MSA)** using simulated annealing optimization
-- **Genome Rearrangement Analysis** including fragile region detection
-- **Chromosomal Graph Operations** for studying genome structure and evolution
+- **Genome Graph Operations** for studying chromosomal structure and rearrangements
 - **Modular Design** with reusable utilities and clear separation of concerns
 
 All algorithms are implemented from scratch without external bioinformatics libraries, making this an excellent educational resource and a solid foundation for custom bioinformatics pipelines.
@@ -18,15 +17,14 @@ All algorithms are implemented from scratch without external bioinformatics libr
 ├── alignment/                    # Sequence alignment algorithms
 │   ├── __init__.py              # Package initialization
 │   └── msa_simulated_annealing.py   # Multiple sequence alignment using SA
-├── genome_rearrangement/        # Genome rearrangement analysis tools
+├── genome_rearrangement/        # Genome graph operations (refactored from FragileRegions.py)
 │   ├── __init__.py              # Package initialization  
-│   └── fragile_regions.py       # Fragile region analysis and genome comparison
+│   └── fragile_regions.py       # Re-exports of original genome graph functions
 ├── utils/                       # Shared utility functions
 │   ├── __init__.py              # Package initialization
 │   └── genome_graph.py          # Core genome graph operations
 ├── examples/                    # Example scripts and demonstrations
-│   ├── run_msa_example.py       # MSA algorithm demonstrations
-│   └── run_genome_analysis_example.py  # Genome analysis demonstrations
+│   └── run_msa_example.py       # MSA algorithm demonstration
 └── README.md                    # This file
 ```
 
@@ -65,19 +63,13 @@ cd /path/to/Bioinformatics
 python examples/run_msa_example.py
 ```
 
-**Genome Analysis Example:**
-```bash
-cd /path/to/Bioinformatics  
-python examples/run_genome_analysis_example.py
-```
-
 ### Using as a Library
 
 ```python
 # Import specific modules
 from alignment import MSASimulatedAnnealing
-from genome_rearrangement import GenomeAnalyzer
-from utils import chromosome_to_cycle, colored_edges
+from genome_rearrangement import chromosome_to_cycle, colored_edges
+from utils import graph_to_genome, two_break_on_genome
 
 # Use in your code
 sequences = ["ACGTACGT", "ACGTCGT", "ACGTACGTT"]
@@ -94,21 +86,17 @@ alignment, score, history = msa.align()
   - Supports both DNA and protein sequences
   - Provides comprehensive scoring and optimization tracking
 
-### Genome Rearrangement (`genome_rearrangement/`)
-- **`fragile_regions.py`**: Comprehensive genome rearrangement analysis toolkit
-  - Fragile region identification and analysis
-  - Two-break rearrangement operations
-  - Genome comparison and validation
-  - Statistical analysis of genome structure
-  - `GenomeAnalyzer` class for interactive analysis
-
-### Utilities (`utils/`)
-- **`genome_graph.py`**: Core genome graph manipulation functions
+### Genome Graph Operations (`genome_rearrangement/` and `utils/`)
+- **`utils/genome_graph.py`**: Core genome graph manipulation functions
   - Chromosome to cycle conversion (`chromosome_to_cycle`)
   - Cycle to chromosome conversion (`cycle_to_chromosome`) 
   - Colored edge generation (`colored_edges`)
   - Graph to genome conversion (`graph_to_genome`)
   - Two-break operations (`two_break_genome_graph`, `two_break_on_genome`)
+
+- **`genome_rearrangement/fragile_regions.py`**: Re-exports of genome graph functions
+  - Provides backward compatibility for original FragileRegions.py functions
+  - Functions are now properly organized in utils/ but accessible here
 
 ## Example Commands
 
@@ -132,30 +120,6 @@ print(f"Final score: {final_score}")
 msa.print_alignment("final")
 ```
 
-### Genome Rearrangement Analysis
-```python
-from genome_rearrangement import GenomeAnalyzer
-
-# Define genome structure
-genome = [
-    [1, 2, 3, 4],     # Chromosome 1
-    [-5, 6, -7],      # Chromosome 2 (negative indicates reverse orientation)
-    [8, 9]            # Chromosome 3
-]
-
-# Analyze genome
-analyzer = GenomeAnalyzer(genome)
-fragility_analysis = analyzer.analyze_fragility()
-
-# Perform rearrangement
-rearrangement_info = analyzer.apply_rearrangement(
-    "two_break", 
-    a=1, b=2, c=3, d=4
-)
-
-print(f"New genome: {analyzer.genome}")
-```
-
 ### Basic Genome Graph Operations
 ```python
 from utils import chromosome_to_cycle, colored_edges
@@ -171,6 +135,21 @@ edges = colored_edges(genome)
 print(f"Colored edges: {edges}")
 ```
 
+### Two-Break Rearrangements
+```python
+from genome_rearrangement import two_break_on_genome
+
+# Define genome structure
+genome = [
+    [1, 2, 3, 4],     # Chromosome 1
+    [-5, 6, -7]       # Chromosome 2 (negative indicates reverse orientation)
+]
+
+# Perform two-break rearrangement (with valid parameters)
+rearranged_genome = two_break_on_genome(genome, a=1, b=2, c=3, d=4)
+print(f"Rearranged genome: {rearranged_genome}")
+```
+
 ## Algorithm Details
 
 ### Multiple Sequence Alignment (Simulated Annealing)
@@ -180,13 +159,7 @@ print(f"Colored edges: {edges}")
 - **Optimization**: Simulated annealing with exponential cooling schedule
 - **Convergence**: Temperature-based termination criterion
 
-### Genome Rearrangement Analysis
-- **Representation**: Signed permutations with breakpoint graphs
-- **Operations**: Two-break rearrangements, inversions
-- **Analysis**: Fragile region detection, structural comparison
-- **Validation**: Input validation and consistency checking
-
-### Graph Operations
+### Genome Graph Operations
 - **Chromosome-Cycle Conversion**: Bidirectional transformation between representations
 - **Colored Edges**: Adjacency representation for genome structure  
 - **Two-Break Operations**: Fundamental rearrangement mechanism
@@ -199,6 +172,16 @@ This repository serves as an excellent educational resource for:
 - **Computational Biology**: Understand the computational aspects of biological problems
 - **Python Programming**: See examples of clean, modular scientific code
 - **Software Design**: Study well-structured bioinformatics software architecture
+
+## Refactoring Notes
+
+This repository has been refactored from its original structure to improve:
+- **Code Organization**: Moved from monolithic files to modular packages
+- **Naming Consistency**: Standardized function names to Python conventions
+- **Documentation**: Added comprehensive docstrings and examples
+- **Maintainability**: Clear separation of concerns and reusable components
+
+The original `FragileRegions.py` contained basic genome graph operations (not actual fragile regions analysis). These functions have been moved to `utils/genome_graph.py` and are re-exported through `genome_rearrangement/fragile_regions.py` for backward compatibility.
 
 ## Contributing
 
